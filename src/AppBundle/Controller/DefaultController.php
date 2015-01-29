@@ -16,6 +16,7 @@ class DefaultController extends Controller
     public function clientConnectAction(Request $request)
     {
         // This is where the mobile client goes to get the page it uses
+        $gameId = $request->query->get('gameId');
         return $this->render('AppBundle:Default:client.html.twig', ['gameId' => $gameId]);
     }
 }
