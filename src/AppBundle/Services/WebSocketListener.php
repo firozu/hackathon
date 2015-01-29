@@ -2,6 +2,7 @@
 namespace AppBundle/Services;
 
 use Ratchet/MessageComponentInterface;
+use Ratchet\ConnectionInterface;
 
 class WebSocketListener implements MessageComponentInterface {
     /**
@@ -18,23 +19,23 @@ class WebSocketListener implements MessageComponentInterface {
         $this->em = $em;
     }
 
-    public function onOpen($event)
+    public function onOpen(ConnectionInterface $conn)
     {
-        var_dump($event);
+        var_dump($conn);
     }
 
-    public function onMessage($message)
+    public function onMessage(ConnectionInterface $from, $message)
     {
         echo $message;
     }
 
-    public function onError($error)
+    public function onError(ConnectionInterface $conn, \Exception $error)
     {
         var_dump($error);
     }
 
-    public function onClose($event)
+    public function onClose(ConnectionInterface $conn)
     {
-        var_dump($event);
+        var_dump($conn);
     }
 }
