@@ -36,7 +36,7 @@ class WebSocketListener implements MessageComponentInterface {
 
     public function onError(ConnectionInterface $conn, \Exception $error)
     {
-        var_dump($error);
+        echo $conn->remoteAddress . ' errored ' . $error->getMessage();
     }
 
     public function onClose(ConnectionInterface $conn)
