@@ -3,5 +3,5 @@ app_homepage:
     defaults: { _controller: AppBundle:Default:index }
 
 app_client_connect:
-    path: /client_connect
+    path: /mobile
     defaults: { _controller: AppBundle:Default:clientConnect }

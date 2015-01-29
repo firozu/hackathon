@@ -10,6 +10,7 @@ class WebSocketListener implements MessageComponentInterface {
      * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
+
     /**
      * Constructor
      *
