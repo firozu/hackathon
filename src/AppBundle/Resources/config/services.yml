@@ -1,0 +1,6 @@
+services:
+    app_socket:
+        class: AppBundle\Services\WebSocketListener
+        arguments:
+            - @doctrine.orm.default_entity_manager
+

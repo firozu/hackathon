@@ -1,4 +1,4 @@
-Team Beacham Hackathon
+Team Nismo Hackathon
 ========================
 
 The hackathon project

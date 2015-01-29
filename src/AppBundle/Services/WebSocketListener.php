@@ -1,7 +1,8 @@
 <?php
-namespace AppBundle/Services;
 
-use Ratchet/MessageComponentInterface;
+namespace AppBundle\Services;
+
+use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class WebSocketListener implements MessageComponentInterface {
