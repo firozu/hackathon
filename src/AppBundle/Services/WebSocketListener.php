@@ -6,29 +6,32 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class WebSocketListener implements MessageComponentInterface {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
 
-    /**
-     * Constructor
-     *
-     * @param \Doctrine\ORM\EntityManager $em
-     */
-    public function __construct($em)
-    {
-        $this->em = $em;
+    protected $connections = [];
+
+    public function __construct() {
+        $this->connections = new \SplObjectStorage;
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
-        var_dump($conn);
+        //$this->connectionPool[] = $conn;
+        $this->connections->attach($conn);
+        echo "A new client connected: " . $conn->remoteAddress . "\n";
     }
 
     public function onMessage(ConnectionInterface $from, $message)
     {
-        echo $message;
+        echo $from->remoteAddress . ' said: ' . $message . "\n";
+
+        $this->connections->rewind();
+
+        foreach($this->connections as $connection) {
+            if ($connection == $from) {
+                continue;
+            }
+            $connection->send($from->remoteAddress . ' said: ' . $message . "\n");
+        }
     }
 
     public function onError(ConnectionInterface $conn, \Exception $error)
@@ -38,6 +41,7 @@ class WebSocketListener implements MessageComponentInterface {
 
     public function onClose(ConnectionInterface $conn)
     {
-        var_dump($conn);
+        $this->connections->detach($conn);
+        echo "A Client disconnected: " . $conn->remoteAddress . "\n";
     }
 }
