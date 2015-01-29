@@ -19,6 +19,7 @@ class SocketCommand extends ContainerAwareCommand
     {
         $sockListener = $this->getContainer()->get('app_socket');
         $server = IoServer::factory($sockListener, 8085);
+        $output->writeln('Socket Server running on port 8085');
         $server->run();
     }
 }
