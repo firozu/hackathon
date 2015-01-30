@@ -11,7 +11,7 @@ class DefaultController extends Controller
     {
         // This is the primary page for the pc browser to hit
         $gameId = $request->query->get('gameId');
-        if ($gameId) {
+        if (!$gameId) {
             $gameId = uniqid();
         }
         return $this->render('AppBundle:Default:index.html.twig', ['gameId' => $gameId]);
