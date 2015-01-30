@@ -10,7 +10,8 @@ class DefaultController extends Controller
     public function indexAction()
     {
         // This is the primary page for the pc browser to hit
-        return $this->render('AppBundle:Default:index.html.twig');
+        $gameId = uniqid();
+        return $this->render('AppBundle:Default:index.html.twig', ['gameId' => $gameId]);
     }
 
     public function clientConnectAction(Request $request)

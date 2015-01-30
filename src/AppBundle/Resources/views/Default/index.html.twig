@@ -1,9 +1,46 @@
 <html>
     <head>
+<script type="text/javascript">
+function WebSocketTest(gameId)
+{
+  if (!("WebSocket" in window)) {
+      alert ("AHH websocket not supported");
+
+      return;
+  }
+     // Let us open a web socket
+     window.ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
+     ws.onopen = function()
+     {
+        // Web Socket is connected, setup game()
+        ws.send(JSON.stringify({'game': gameId, 'mobile': false}));
+     };
+     ws.onmessage = function (evt)
+     {
+        var message = evt.data;
+        var gyro = JSON.parse(message);
+        console.log(gyro);
+     };
+     ws.onclose = function()
+     {
+        // websocket is closed go back to game connect
+        window.ws = null;
+        alert('sock Closed');
+     };
+}
+function closeWs()
+{
+    ws.close();
+}
+</script>
     </head>
     <body>
         <h3>Hello and welcom to Team Nismo hackathon project!</h3>
+        <div id="sse">
+            <a href="javascript:WebSocketTest('{{ gameId }}')">Run WebSocket</a>
+            <a href="javascript:closeWs()">Close Websocket</a>
+        </div>
 
-        <img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=http%3A%2F%2Fdiceubu.tib.ad.ea.com%3A8000%2Fmobile%3FgameId%3D3" />
+        <img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl={{ url('app_client_connect', {'gameId' : gameId}) }}" />
     </body>
 </html>

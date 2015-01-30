@@ -11,10 +11,11 @@ function WebSocketTest(gameId)
   }
      // Let us open a web socket
      window.ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
+     window.gameId = gameId;
      ws.onopen = function()
      {
         // Web Socket is connected, setup game()
-        ws.send(JSON.stringify({'game': gameId}));
+        ws.send(JSON.stringify({'game': gameId, 'mobile': true}));
      };
      ws.onmessage = function (evt)
      {
@@ -24,32 +25,63 @@ function WebSocketTest(gameId)
      {
         // websocket is closed go back to game connect
         window.ws = null;
+        alert('socket closed');
      };
 }
 
 function sendit(event) {
-    console.log(event);
+    var toGo = {};
+    if (
+        event.hasOwnProperty('accelerationIncludingGravity') &&
+        event.accelerationIncludingGravity.x !== null
+    ) {
+        toGo.x = Math.round(event.accelerationIncludingGravity.x * 1000) / 1000;
+        toGo.y = Math.round(event.accelerationIncludingGravity.y * 1000) / 1000;
+        toGo.z = Math.round(event.accelerationIncludingGravity.z * 1000) / 1000;
+    }
+    if (
+        event.hasOwnProperty('rotationRate') &&
+        event.rotationRate.alpha !== null
+    ) {
+        toGo.a = Math.round(event.rotationRate.alpha * 1000) / 1000;
+        toGo.b = Math.round(event.rotationRate.beta * 1000) / 1000;
+        toGo.g = Math.round(event.rotationRate.gamma * 1000) / 1000;
+    }
     if (!window.ws) {
         return;
     }
-    ws.send(JSON.stringify(event));
+    ws.send(JSON.stringify(toGo));
 }
 
+var support = false;
 if (window.DeviceOrientationEvent) {
-    window.addEventListener("deviceorientation", sendit, true);
-} else if (window.DeviceMotionEvent) {
+    window.addEventListener("deviceorientation", function(event) {
+        console.log(event); //Contains nothing for my phone
+    }, true);
+    support = true;
+}
+if (window.DeviceMotionEvent) {
     window.addEventListener('devicemotion', sendit, true);
-} else {
-    window.addEventListener("MozOrientation", sendit, true);
+    support = true;
 }
 
+if (!support) {
+    alert('Phone did not bind to a gyro  event');
+}
+
+function closeWs()
+{
+    ws.close();
+}
 </script>
     </head>
     <body>
         <h3>Hello and welcom to Team Nismo hackathon project mobile client!</h3>
         <p>You will now be connected to game {{ gameId }}</p>
         <div id="sse">
-            <a href="javascript:WebSocketTest({{ gameId }})">Run WebSocket</a>
+            <a href="javascript:WebSocketTest('{{ gameId }}')">Run WebSocket</a>
+            <a href="javascript:closeWs()">Close Websocket</a>
         </div>
+
     </body>
 </html>

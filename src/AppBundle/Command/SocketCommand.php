@@ -5,6 +5,8 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Ratchet\Server\IoServer;
+use Ratchet\WebSocket\WsServer;
+use Ratchet\Http\HttpServer;
 
 class SocketCommand extends ContainerAwareCommand
 {
@@ -18,8 +20,15 @@ class SocketCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $sockListener = $this->getContainer()->get('app_socket');
-        $server = IoServer::factory($sockListener, 8085);
+        $server = IoServer::factory(
+            new HttpServer(new WsServer($sockListener)),
+            8085
+        );
         $output->writeln('Socket Server running on port 8085');
-        $server->run();
+        try {
+            $server->run();
+        } catch (\Exception $e) {
+            echo $e;
+        }
     }
 }
