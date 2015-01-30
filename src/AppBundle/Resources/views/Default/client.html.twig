@@ -2,43 +2,54 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript">
-function WebSocketTest()
+function WebSocketTest(gameId)
 {
-  if ("WebSocket" in window)
-  {
-     alert("WebSocket is supported by your Browser!");
+  if (!("WebSocket" in window)) {
+      alert ("AHH websocket not supported");
+
+      return;
+  }
      // Let us open a web socket
-     var ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
+     window.ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
      ws.onopen = function()
      {
-        // Web Socket is connected, send data using send()
-        ws.send("Message to send");
-        alert("Message is sent...");
+        // Web Socket is connected, setup game()
+        ws.send(JSON.stringify({'game': gameId}));
      };
      ws.onmessage = function (evt)
      {
-        var received_msg = evt.data;
-        alert("Message is received..." + received_msg);
+        var message = evt.data;
      };
      ws.onclose = function()
      {
-        // websocket is closed.
-        alert("Connection is closed...");
+        // websocket is closed go back to game connect
+        window.ws = null;
      };
-  }
-  else
-  {
-     // The browser doesn't support WebSocket
-     alert("WebSocket NOT supported by your Browser!");
-  }
 }
+
+function sendit(event) {
+    console.log(event);
+    if (!window.ws) {
+        return;
+    }
+    ws.send(JSON.stringify(event));
+}
+
+if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", sendit, true);
+} else if (window.DeviceMotionEvent) {
+    window.addEventListener('devicemotion', sendit, true);
+} else {
+    window.addEventListener("MozOrientation", sendit, true);
+}
+
 </script>
     </head>
     <body>
         <h3>Hello and welcom to Team Nismo hackathon project mobile client!</h3>
         <p>You will now be connected to game {{ gameId }}</p>
-    <div id="sse">
-        <a href="javascript:WebSocketTest()">Run WebSocket</a>
-    </div>
+        <div id="sse">
+            <a href="javascript:WebSocketTest({{ gameId }})">Run WebSocket</a>
+        </div>
     </body>
 </html>
