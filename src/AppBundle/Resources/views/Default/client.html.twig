@@ -47,25 +47,24 @@ function sendit(event) {
         toGo.b = Math.round(event.rotationRate.beta * 1000) / 1000;
         toGo.g = Math.round(event.rotationRate.gamma * 1000) / 1000;
     }
+    if (event.hasOwnProperty('alpha') &&
+        event.alpha !== null
+    ) {
+        toGo.a = Math.round(event.alpha * 1000) / 1000;
+        toGo.b = Math.round(event.beta * 1000) / 1000;
+        toGo.g = Math.round(event.gamma * 1000) / 1000;
+    }
     if (!window.ws) {
         return;
     }
     ws.send(JSON.stringify(toGo));
 }
 
-var support = false;
 if (window.DeviceOrientationEvent) {
-    window.addEventListener("deviceorientation", function(event) {
-        console.log(event); //Contains nothing for my phone
-    }, true);
-    support = true;
-}
-if (window.DeviceMotionEvent) {
+    window.addEventListener("deviceorientation", sendit, true);
+} else if (window.DeviceMotionEvent) {
     window.addEventListener('devicemotion', sendit, true);
-    support = true;
-}
-
-if (!support) {
+} else {
     alert('Phone did not bind to a gyro  event');
 }
 
