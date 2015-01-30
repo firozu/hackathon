@@ -7,10 +7,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
 {
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         // This is the primary page for the pc browser to hit
-        $gameId = uniqid();
+        $gameId = $request->query->get('gameId');
+        if ($gameId) {
+            $gameId = uniqid();
+        }
         return $this->render('AppBundle:Default:index.html.twig', ['gameId' => $gameId]);
     }
 

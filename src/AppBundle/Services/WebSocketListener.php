@@ -43,7 +43,7 @@ class WebSocketListener implements MessageComponentInterface {
             $splObj->mobile = $params['mobile'];
         } else {
             $gameId = $splObj->gameId;
-            $this->connections->rewind();
+
             foreach($this->connections as $socket) {
                 if ($socket->gameId !== $gameId) {
                     continue;
