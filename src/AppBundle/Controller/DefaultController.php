@@ -23,4 +23,9 @@ class DefaultController extends Controller
         $gameId = $request->query->get('gameId');
         return $this->render('AppBundle:Default:client.html.twig', ['gameId' => $gameId]);
     }
+
+    public function threeAction(Request $request)
+    {
+        return $this->render('AppBundle:Default:three.html.twig');
+    }
 }

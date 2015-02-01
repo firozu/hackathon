@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+<script type="text/javascript">
+function WebSocketTest(gameId)
+{
+  if (!("WebSocket" in window)) {
+      alert ("AHH websocket not supported");
+
+      return;
+  }
+     // Let us open a web socket
+     window.ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
+     ws.onopen = function()
+     {
+        // Web Socket is connected, setup game()
+        ws.send(JSON.stringify({'game': gameId, 'mobile': false}));
+     };
+     ws.onmessage = function (evt)
+     {
+        var message = evt.data;
+        var gyro = JSON.parse(message);
+        console.log(gyro);
+        deviceOrientationHandler(gyro.g, gyro.b, gyro.a);
+     };
+     ws.onclose = function()
+     {
+        // websocket is closed go back to game connect
+        window.ws = null;
+        alert('sock Closed');
+     };
+}
+
+    var count = 0;
+
+    function deviceOrientationHandler(tiltLR, tiltFB, dir) {
+      document.getElementById("doTiltLR").innerHTML = Math.round(tiltLR);
+      document.getElementById("doTiltFB").innerHTML = Math.round(tiltFB);
+      document.getElementById("doDirection").innerHTML = Math.round(dir);
+
+      // Apply the transform to the image
+      var logo = document.getElementById("imgLogo");
+      logo.style.webkitTransform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+      logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
+      logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+    }
+
+
+    // Some other fun rotations to try...
+    //var rotation = "rotate3d(0,1,0, "+ (tiltLR*-1)+"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+    //var rotation = "rotate("+ tiltLR +"deg) rotate3d(0,1,0, "+ (tiltLR*-1)+"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+
+function closeWs()
+{
+    ws.close();
+}
+</script>
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+    }
+
+      .main {
+      border: 1px solid black;
+      box-shadow: 10px 10px 5px #888;
+      border-radius: 12px;
+      padding: 20px;
+      background-color: #ddd;
+      margin: 25px;
+      width: 450px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    .logo {
+      width:275px;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      padding: 15px;
+    }
+
+    .container {
+      -webkit-perspective: 300; perspective: 300;
+    }
+  </style>
+
+</head>
+<body>
+    <h3>Hello and welcom to Team Nismo hackathon project!</h3>
+    <div id="sse">
+        <a href="javascript:WebSocketTest('{{ gameId }}')">Run WebSocket</a>
+        <a href="javascript:closeWs()">Close Websocket</a>
+    </div>
+    <img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl={{ url('app_client_connect', {'gameId' : gameId}) }}" />
+  <div class="main">
+      <h2>Device Orientation</h2>
+      <table>
+        <tr>
+          <td>Event Supported</td>
+          <td id="doEvent"></td>
+        </tr>
+        <tr>
+          <td>Tilt Left/Right [gamma]</td>
+          <td id="doTiltLR"></td>
+        </tr>
+        <tr>
+          <td>Tilt Front/Back [beta]</td>
+          <td id="doTiltFB"></td>
+        </tr>
+        <tr>
+          <td>Direction [alpha]</td>
+          <td id="doDirection"></td>
+        </tr>
+      </table>
+  </div>
+  <div class="container" style="-webkit-perspective: 300; perspective: 300;">
+    <img src="http://www.html5rocks.com/en/tutorials/device/orientation/html5_logo.png" id="imgLogo" class="logo">
+  </div>
+
+</body>
+</html>
