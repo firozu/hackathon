@@ -2,6 +2,16 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript">
+var offset = {
+  a: 0,
+  b: 0,
+  g: 0
+};
+var current = {
+  a: 0,
+  b: 0,
+  g: 0
+};
 function WebSocketTest(gameId)
 {
   if (!("WebSocket" in window)) {
@@ -31,6 +41,8 @@ function WebSocketTest(gameId)
 
 function sendit(event) {
     var toGo = {};
+    var alphaOffset;
+    var gammaOffset;
     if (
         event.accelerationIncludingGravity &&
         event.accelerationIncludingGravity.x !== null
@@ -40,21 +52,58 @@ function sendit(event) {
         toGo.z = Math.round(event.accelerationIncludingGravity.z * 1000) / 1000;
     }
     if (
-        event.rotationRate &&
-        event.rotationRate.alpha !== null
+        event.acceleration &&
+        event.acceleration.alpha !== null
     ) {
-        toGo.a = Math.round(event.rotationRate.alpha * 1000) / 1000;
-        toGo.b = Math.round(event.rotationRate.beta * 1000) / 1000;
-        toGo.g = Math.round(event.rotationRate.gamma * 1000) / 1000;
+        alphaOffset = acceleration.alpha - offset.a;
+        gammaOffset = acceleration.gamma - offset.g;
+        current.a = event.acceleration.alpha;
+        current.b = event.acceleration.beta;
+        current.g = event.acceleration.gamma;
+        toGo.a = Math.round(event.acceleration.alpha * 1000) / 1000;
+        toGo.b = Math.round(event.acceleration.beta * 1000) / 1000;
+        toGo.g = Math.round(event.acceleration.gamma * 1000) / 1000;
+        toGo.turn = alphaOffset % 360;
+        toGo.throttle = gammaOffset % 90;
+        document.getElementById('turnOff').innerHTML = toGo.turn;
+        document.getElementById('throttleOff').innerHTML = toGo.throttle;
     }
     if (event.alpha &&
         event.alpha !== null
     ) {
-
+        alphaOffset = event.alpha - offset.a;
+        gammaOffset = event.gamma - offset.g;
+        current.a = event.alpha;
+        current.b = event.beta;
+        current.g = event.gamma;
         toGo.a = Math.round(event.alpha * 1000) / 1000;
         toGo.b = Math.round(event.beta * 1000) / 1000;
         toGo.g = Math.round(event.gamma * 1000) / 1000;
+        toGo.turn = alphaOffset % 360;
+        toGo.throttle = gammaOffset % 90;
+        document.getElementById('turnOff').innerHTML = toGo.turn;
+        document.getElementById('throttleOff').innerHTML = toGo.throttle;
     }
+    if (toGo.turn > 180) {
+      toGo.turn *= -1;
+    }
+    if (toGo.throttle > 45) {
+      toGo.throttle = 45;
+    }
+    if (toGo.throttle < -45) {
+      toGo.throttle = -45;
+    }
+    toGo.turn = 90 / toGo.turn;
+    toGo.throttle = 45 / toGo.throttle;
+
+    document.getElementById('currenta').innerHTML = current.a;
+    document.getElementById('currentb').innerHTML = current.b;
+    document.getElementById('currentg').innerHTML = current.g;
+    document.getElementById('offseta').innerHTML = offset.a;
+    document.getElementById('offsetb').innerHTML = offset.b;
+    document.getElementById('offsetg').innerHTML = offset.g;
+    document.getElementById('turn').innerHTML = toGo.turn;
+    document.getElementById('throttle').innerHTML = toGo.throttle;
     if (!window.ws) {
         return;
     }
@@ -74,6 +123,11 @@ function closeWs()
 {
     ws.close();
 }
+function center() {
+  offset.a = current.a;
+  offset.b = current.b;
+  offset.g = current.g;
+}
 </script>
     </head>
     <body>
@@ -83,6 +137,51 @@ function closeWs()
             <a href="javascript:WebSocketTest('{{ gameId }}')">Run WebSocket</a>
             <a href="javascript:closeWs()">Close Websocket</a>
         </div>
+        <div>
+          <a href="javascript:center()">Center</a>
+        </div>
+              <h2>Device Orientation</h2>
+      <table>
+        <tr>
+          <td>current a</td>
+          <td id="currenta"></td>
+        </tr>
+        <tr>
+          <td>current b</td>
+          <td id="currentb"></td>
+        </tr>
+        <tr>
+          <td>current g</td>
+          <td id="currentg"></td>
+        </tr>
+        <tr>
+          <td>offet a</td>
+          <td id="offseta"></td>
+        </tr>
+        <tr>
+          <td>offset b</td>
+          <td id="offsetb"></td>
+        </tr>
+        <tr>
+          <td>Offset g</td>
+          <td id="offsetg"></td>
+        </tr>
+                <tr>
+          <td>turn %</td>
+          <td id="turn"></td>
+        </tr>
+        <tr>
+          <td>Throttle %</td>
+          <td id="throttle"></td>
+        </tr>
+        <tr>
+          <td>turn offset </td>
+          <td id="turnOff"></td>
+        </tr>        <tr>
+          <td>throttle offeset</td>
+          <td id="throttleOff"></td>
+        </tr>
+      </table>
 
     </body>
 </html>

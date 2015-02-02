@@ -23,7 +23,7 @@ function WebSocketTest(gameId)
         var message = evt.data;
         var gyro = JSON.parse(message);
         console.log(gyro);
-        deviceOrientationHandler(gyro.g, gyro.b, gyro.a);
+        deviceOrientationHandler(gyro.g, gyro.b, gyro.a, gyro.turn, gyro.throttle);
      };
      ws.onclose = function()
      {
@@ -35,16 +35,23 @@ function WebSocketTest(gameId)
 
     var count = 0;
 
-    function deviceOrientationHandler(tiltLR, tiltFB, dir) {
+    function deviceOrientationHandler(tiltLR, tiltFB, dir, turn, throttle) {
       document.getElementById("doTiltLR").innerHTML = Math.round(tiltLR);
       document.getElementById("doTiltFB").innerHTML = Math.round(tiltFB);
       document.getElementById("doDirection").innerHTML = Math.round(dir);
+      document.getElementById("doTurn").innerHTML = turn;
+      document.getElementById("doThrottle").innerHTML = throttle;
 
       // Apply the transform to the image
       var logo = document.getElementById("imgLogo");
+      var box = document.getElementById("box");
       logo.style.webkitTransform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
       logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
       logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+
+      var bounds = box.getBoundingClientRect();
+      box.style.top = (bounds.top + Math.round(5 * throttle)) + 'px';
+      box.style.left = (bounds.left + Math.round(5 * turn)) + 'px';
     }
 
 
@@ -82,6 +89,15 @@ function closeWs()
       padding: 15px;
     }
 
+    #box {
+      width: 50px;
+      height: 50px;
+      background-color: green;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+    }
+
     .container {
       -webkit-perspective: 300; perspective: 300;
     }
@@ -114,11 +130,19 @@ function closeWs()
           <td>Direction [alpha]</td>
           <td id="doDirection"></td>
         </tr>
+        <tr>
+          <td>Turn %</td>
+          <td id="doTurn"></td>
+        </tr>
+        <tr>
+          <td>Throttle %</td>
+          <td id="doThrottle"></td>
+        </tr>
       </table>
   </div>
   <div class="container" style="-webkit-perspective: 300; perspective: 300;">
     <img src="http://www.html5rocks.com/en/tutorials/device/orientation/html5_logo.png" id="imgLogo" class="logo">
   </div>
-
+  <div id="box"></div>
 </body>
 </html>
