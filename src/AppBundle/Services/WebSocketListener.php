@@ -77,7 +77,7 @@ class WebSocketListener implements MessageComponentInterface {
                 continue; // skip mobiles;
             }
             $cgame = $splConn->gameId;
-            if (isset($gameIds[$cgame]) {
+            if (isset($gameIds[$cgame])) {
                 ++$gameIds[$cgame];
             } else {
                 $gameIds[$cgame] = 1;
@@ -122,7 +122,7 @@ class WebSocketListener implements MessageComponentInterface {
         //attach to a game;
         $splObj->gameId = $params['game'];
         $splObj->mobile = $params['mobile'];
-        if(isset($params['playerId')) {
+        if(isset($params['playerId'])) {
             $splObj->playerId = $params['playerId'];
         } else {
             $splObj->playerId = 1;
@@ -134,7 +134,7 @@ class WebSocketListener implements MessageComponentInterface {
     }
 
     //I know this duplicates the other function, dont care
-    private function $this->sendWaitingUpdate()
+    private function sendWaitingUpdate()
     {
         $sendList = [];
         $gameList = [];
