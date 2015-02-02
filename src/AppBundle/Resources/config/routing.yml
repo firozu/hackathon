@@ -8,4 +8,4 @@ app_client_connect:
 
 app_waiting_game_list:
     path: /
-    defaults: { _controller: AppBundle:Default:gameListConnect }
+    defaults: { _controller: AppBundle:Default:gameList }

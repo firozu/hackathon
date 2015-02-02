@@ -56,6 +56,10 @@ function closeWs()
 {
     ws.close();
 }
+
+window.addEventListener('load' , function() {
+    WebSocketTest('{{ gameId }}', {{ playerId }});
+});
 </script>
   <style type="text/css">
     body {

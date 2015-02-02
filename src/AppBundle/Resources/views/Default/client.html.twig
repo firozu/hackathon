@@ -70,6 +70,10 @@ if (window.DeviceOrientationEvent) {
     alert('Phone did not bind to a gyro  event');
 }
 
+window.addEventListener('load' , function() {
+    WebSocketTest('{{ gameId }}', {{ playerId }});
+});
+
 function closeWs()
 {
     ws.close();

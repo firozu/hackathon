@@ -35,9 +35,9 @@ function updateGameList(games) {
 
     for(i = 0; i < games.length; i++) {
         var a = document.createElement('a');
-        var txt = document.createTextNode('gameId: ' . games[i]);
+        var txt = document.createTextNode('gameId: ' + games[i]);
         a.appendChild(txt);
-        a.href = 'http://' + window.location.hostname + '/game?gameId=' + game[i] + '&playerId=2';
+        a.href = 'http://' + window.location.hostname + '/game?gameId=' + games[i] + '&playerId=2';
         gameList.appendChild(a);
     }
 }
@@ -45,16 +45,26 @@ function closeWs()
 {
     ws.close();
 }
+
+window.addEventListener('load' ,WebSocketTest);
 </script>
     </head>
     <body>
         <h3>Hello and welcom to Team Nismo hackathon project!</h3>
+        <a href="{{ path('app_homepage') }}">Create New Game</a>
+
+        <br />
+        <br />
+        OR connect to currently waiting game
+        <div id="gameList">
+            Will update with games
+        </div>
+        <br />
+        <br />
+        <br />
         <div id="sse">
             <a href="javascript:WebSocketTest()">Run WebSocket</a>
             <a href="javascript:closeWs()">Close Websocket</a>
-        </div>
-        <div id="gameList">
-            Will update with games
         </div>
     </body>
 </html>

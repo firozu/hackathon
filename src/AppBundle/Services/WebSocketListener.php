@@ -73,7 +73,7 @@ class WebSocketListener implements MessageComponentInterface {
             if (!$splConn->gameId) {
                 continue;
             }
-            if (!$splConn->mobile) {
+            if ($splConn->mobile) {
                 continue; // skip mobiles;
             }
             $cgame = $splConn->gameId;
@@ -172,7 +172,13 @@ class WebSocketListener implements MessageComponentInterface {
 
     public function onClose(ConnectionInterface $conn)
     {
-        $this->connections->detach($conn);
-        echo "A Client disconnected: " . $conn->remoteAddress . "\n";
+        $splObj = null;
+        foreach ($this->connections as $spl) {
+            if ($spl->conn == $conn) {
+                $splObj = $spl;
+                break;
+            }
+        }
+        $this->connections->detach($splObj);
     }
 }
