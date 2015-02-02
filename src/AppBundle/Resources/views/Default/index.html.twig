@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title></title>
 <script type="text/javascript">
-function WebSocketTest(gameId)
+function WebSocketTest(gameId, playerId)
 {
   if (!("WebSocket" in window)) {
       alert ("AHH websocket not supported");
@@ -16,7 +16,7 @@ function WebSocketTest(gameId)
      ws.onopen = function()
      {
         // Web Socket is connected, setup game()
-        ws.send(JSON.stringify({'game': gameId, 'mobile': false}));
+        ws.send(JSON.stringify({'game': gameId, 'mobile': false, 'playerId' : playerId }));
      };
      ws.onmessage = function (evt)
      {
@@ -91,10 +91,10 @@ function closeWs()
 <body>
     <h3>Hello and welcom to Team Nismo hackathon project!</h3>
     <div id="sse">
-        <a href="javascript:WebSocketTest('{{ gameId }}')">Run WebSocket</a>
+        <a href="javascript:WebSocketTest('{{ gameId }}', {{ playerId }})">Run WebSocket</a>
         <a href="javascript:closeWs()">Close Websocket</a>
     </div>
-    <img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl={{ url('app_client_connect', {'gameId' : gameId}) }}" />
+    <img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl={{ url('app_client_connect', {'gameId' : gameId, 'playerId' : playerId}) | url_encode }}" />
   <div class="main">
       <h2>Device Orientation</h2>
       <table>

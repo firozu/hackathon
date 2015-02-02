@@ -14,7 +14,14 @@ class DefaultController extends Controller
         if (!$gameId) {
             $gameId = uniqid();
         }
-        return $this->render('AppBundle:Default:index.html.twig', ['gameId' => $gameId]);
+        $playerId = $request->query->get('playerId');
+        if (!$playerId) {
+            $playerId = 1;
+        }
+        return $this->render('AppBundle:Default:index.html.twig', [
+            'gameId' => $gameId,
+            'playerId' => $playerId
+        ]);
     }
 
     public function gameListAction()

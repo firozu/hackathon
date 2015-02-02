@@ -2,7 +2,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript">
-function WebSocketTest(gameId)
+function WebSocketTest(gameId, playerId)
 {
   if (!("WebSocket" in window)) {
       alert ("AHH websocket not supported");
@@ -15,7 +15,7 @@ function WebSocketTest(gameId)
      ws.onopen = function()
      {
         // Web Socket is connected, setup game()
-        ws.send(JSON.stringify({'game': gameId, 'mobile': true}));
+        ws.send(JSON.stringify({'game': gameId, 'mobile': true, 'playerId' : playerId}));
      };
      ws.onmessage = function (evt)
      {
@@ -80,7 +80,7 @@ function closeWs()
         <h3>Hello and welcom to Team Nismo hackathon project mobile client!</h3>
         <p>You will now be connected to game {{ gameId }}</p>
         <div id="sse">
-            <a href="javascript:WebSocketTest('{{ gameId }}')">Run WebSocket</a>
+            <a href="javascript:WebSocketTest('{{ gameId }}', {{ playerId }})">Run WebSocket</a>
             <a href="javascript:closeWs()">Close Websocket</a>
         </div>
 

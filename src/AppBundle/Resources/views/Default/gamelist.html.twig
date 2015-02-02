@@ -8,28 +8,25 @@ function WebSocketTest()
 
       return;
   }
-     // Let us open a web socket
-     window.ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
-     ws.onopen = function()
-     {
-        // Web Socket is connected, setup game()
-        ws.send(JSON.stringify({'getList': 1}));
-     };
-     ws.onmessage = function (evt)
-     {
-        var message = evt.data;
-        var gameList = JSON.parse(message);
-        if (gameList.games) {
-            updateGameList(gameList.games);
-        }
-        console.log(gameList);
-     };
-     ws.onclose = function()
-     {
-        // websocket is closed go back to game connect
-        window.ws = null;
-        alert('sock Closed');
-     };
+  // Let us open a web socket
+  window.ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
+  ws.onopen = function() {
+    // Web Socket is connected, setup game()
+    ws.send(JSON.stringify({'getList': 1}));
+  };
+  ws.onmessage = function (evt) {
+    var message = evt.data;
+    var gameList = JSON.parse(message);
+    if (gameList.games) {
+      updateGameList(gameList.games);
+    }
+    console.log(gameList);
+  };
+  ws.onclose = function() {
+    // websocket is closed go back to game connect
+    window.ws = null;
+    alert('sock Closed');
+  };
 }
 
 function updateGameList(games) {
