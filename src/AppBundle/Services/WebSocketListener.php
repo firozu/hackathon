@@ -20,6 +20,7 @@ class WebSocketListener implements MessageComponentInterface {
         $obj->gameId = null;
         $obj->conn = $conn;
         $obj->mobile = null;
+        $obj->playerId = null;
         $this->connections->attach($obj);
         echo "A new client connected: " . $conn->remoteAddress . "\n";
     }
@@ -38,27 +39,129 @@ class WebSocketListener implements MessageComponentInterface {
         $params = json_decode($message, true);
 
         if (isset($params['game'])) {
-            //attach to a game;
-            $splObj->gameId = $params['game'];
-            $splObj->mobile = $params['mobile'];
+            // A client is attempting to attach to a game
+            $this->attachToGame($splObj, $params);
+        } else if (isset($params['getList'])) {
+            // They are asking for a list of waiting games
+            $this->sendWaiting($from);
+        } elseif (isset($params['p2u'])) {
+            // Player 2 console update;
+            $this->sendSlaveUpdate($splObj, $params);
         } else {
-            $gameId = $splObj->gameId;
-            $this->connections->rewind();
-            foreach($this->connections as $socket) {
-                if ($socket->gameId !== $gameId) {
-                    continue;
-                }
-                if ($socket == $splObj) {
-                    continue;
-                }
-                if ($socket->mobile) {
-                    continue;
-                }
+            // Send gyros to master
+            $this->sendMasterUpdate($splObj, $params);
+        }
+    }
 
-                echo 'sent to : ' . $socket->conn->remoteAddress . "\n";
-
-                $socket->conn->send(json_encode($params));
+    private function sendSlaveUpdate($splObj, $params)
+    {
+        foreach ($this->connections as $splConn) {
+            if ($splObj->gameId != $splConn->gameId) {
+                continue;
             }
+            if ($splConn->mobile) {
+                continue;
+            }
+            $splConn->conn->send(json_encode($params));
+        }
+    }
+
+    private function sendWaiting($from)
+    {
+        $gameIds = [];
+        foreach ($this->connections as $splConn) {
+            if (!$splConn->gameId) {
+                continue;
+            }
+            if (!$splConn->mobile) {
+                continue; // skip mobiles;
+            }
+            $cgame = $splConn->gameId;
+            if (isset($gameIds[$cgame]) {
+                ++$gameIds[$cgame];
+            } else {
+                $gameIds[$cgame] = 1;
+            }
+        }
+        $sendAble = [];
+        foreach ($gameIds as $gameId => $count) {
+            if ($count == 1) {
+                $sendAble[] = $gameId;
+            }
+        }
+        $from->send(json_encode(['games' => $sendAble]));
+    }
+
+    private function sendMasterUpdate($splObj, $params)
+    {
+        $gameId = $splObj->gameId;
+        $this->connections->rewind();
+        foreach($this->connections as $socket) {
+            if ($socket->gameId !== $gameId) {
+                continue;
+            }
+            if ($socket == $splObj) {
+                continue;
+            }
+            if ($socket->mobile) {
+                continue;
+            }
+            if ($socket->playerId != 1) {
+                continue;
+            }
+            $params['p'] = $splObj['playerId'];
+
+            $socket->conn->send(json_encode($params));
+
+            return;
+        }
+    }
+
+    private function attachToGame($splObj, $params)
+    {
+        //attach to a game;
+        $splObj->gameId = $params['game'];
+        $splObj->mobile = $params['mobile'];
+        if(isset($params['playerId')) {
+            $splObj->playerId = $params['playerId'];
+        } else {
+            $splObj->playerId = 1;
+        }
+
+        if (!$splObj->mobile && $splObj->playerId == 1) {
+            $this->sendWaitingUpdate();
+        }
+    }
+
+    //I know this duplicates the other function, dont care
+    private function $this->sendWaitingUpdate()
+    {
+        $sendList = [];
+        $gameList = [];
+        foreach($this->connections as $client) {
+            if ($client->mobile) {
+                continue;
+            }
+            if (!$client->gameId) {
+                $sendList[] = $client->conn;
+                continue;
+            }
+            if (isset($gameList[$client->gameId])) {
+                ++$gameList[$client->gameId];
+            } else {
+                $gameList[$client->gameId] = 1;
+            }
+        }
+
+        $toSend = [];
+        foreach($gameList as $gameId => $count) {
+            if ($count == 1) {
+                $toSend[] = $gameId;
+            }
+        }
+
+        foreach($sendList as $conn) {
+            $conn->send(json_encode(['games' => $toSend]));
         }
     }
 

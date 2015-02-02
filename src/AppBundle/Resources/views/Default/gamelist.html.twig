@@ -1,0 +1,63 @@
+<html>
+    <head>
+<script type="text/javascript">
+function WebSocketTest()
+{
+  if (!("WebSocket" in window)) {
+      alert ("AHH websocket not supported");
+
+      return;
+  }
+     // Let us open a web socket
+     window.ws = new WebSocket("ws://"+ window.location.hostname +":8085/");
+     ws.onopen = function()
+     {
+        // Web Socket is connected, setup game()
+        ws.send(JSON.stringify({'getList': 1}));
+     };
+     ws.onmessage = function (evt)
+     {
+        var message = evt.data;
+        var gameList = JSON.parse(message);
+        if (gameList.games) {
+            updateGameList(gameList.games);
+        }
+        console.log(gameList);
+     };
+     ws.onclose = function()
+     {
+        // websocket is closed go back to game connect
+        window.ws = null;
+        alert('sock Closed');
+     };
+}
+
+function updateGameList(games) {
+    var gameList = document.getElementById('gameList');
+    gameList.innerHTML = '';
+
+    for(i = 0; i < games.length; i++) {
+        var a = document.createElement('a');
+        var txt = document.createTextNode('gameId: ' . games[i]);
+        a.appendChild(txt);
+        a.href = 'http://' + window.location.hostname + '/game?gameId=' + game[i] + '&playerId=2';
+        gameList.appendChild(a);
+    }
+}
+function closeWs()
+{
+    ws.close();
+}
+</script>
+    </head>
+    <body>
+        <h3>Hello and welcom to Team Nismo hackathon project!</h3>
+        <div id="sse">
+            <a href="javascript:WebSocketTest()">Run WebSocket</a>
+            <a href="javascript:closeWs()">Close Websocket</a>
+        </div>
+        <div id="gameList">
+            Will update with games
+        </div>
+    </body>
+</html>

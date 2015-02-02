@@ -14,10 +14,19 @@ class DefaultController extends Controller
         return $this->render('AppBundle:Default:index.html.twig', ['gameId' => $gameId]);
     }
 
+    public function gameListAction()
+    {
+        return $this->render('AppBundle:Default:gamelist.html.twig');
+    }
+
     public function clientConnectAction(Request $request)
     {
         // This is where the mobile client goes to get the page it uses
         $gameId = $request->query->get('gameId');
-        return $this->render('AppBundle:Default:client.html.twig', ['gameId' => $gameId]);
+        $playerId = $request->query->get('playerId');
+        return $this->render('AppBundle:Default:client.html.twig',[
+            'gameId' => $gameId,
+            'playerId' => $playerId
+        ]);
     }
 }

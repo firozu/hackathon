@@ -1,7 +1,11 @@
 app_homepage:
-    path:     /
+    path: /game
     defaults: { _controller: AppBundle:Default:index }
 
 app_client_connect:
     path: /mobile
     defaults: { _controller: AppBundle:Default:clientConnect }
+
+app_waiting_game_list:
+    path: /
+    defaults: { _controller: AppBundle:Default:gameListConnect }
